@@ -263,8 +263,8 @@ console.log('Gagal mendaftar Service Worker', err);
 // Initialize Lucide Icons
 lucide.createIcons();
 
-// State Management
-let poData = JSON.parse(localStorage.getItem('poData')) || [];
+// State Management - KUNCI LOCAL STORAGE DIUBAH MENJADI 'antiniPoData' AGAR TIDAK BENTROK
+let poData = JSON.parse(localStorage.getItem('antiniPoData')) || [];
 let currentLunasId = null;
 
 // Custom Toast Message
@@ -640,9 +640,9 @@ doc.save(`Antini_PO_${new Date().toISOString().split('T')[0]}.pdf`);
 showToast("Berhasil mendownload PDF!");
 };
 
-// Save to LocalStorage
+// Save to LocalStorage - KUNCI LOCAL STORAGE DIUBAH MENJADI 'antiniPoData' AGAR TIDAK BENTROK
 const saveData = () => {
-localStorage.setItem('poData', JSON.stringify(poData));
+localStorage.setItem('antiniPoData', JSON.stringify(poData));
 };
 
 // Reset Form
