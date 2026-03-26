@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Antini PO Manager</title>
+
+<!-- PWA Meta Tags -->
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#ffffff">
+<link rel="apple-touch-icon" href="./Arzhop new.png">
+
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com"></script>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<!-- Lucide Icons -->
+<script src="https://unpkg.com/lucide@latest"></script>
+<!-- SheetJS Style (Excel Export with Styling/Borders) -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
+<!-- jsPDF & AutoTable (PDF Export) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+
+<script>
+tailwind.config = {
+theme: {
+extend: {
+fontFamily: {
+sans: ['Inter', 'sans-serif'],
+},
+colors: {
+primary: {
+50: '#eff6ff',
+100: '#dbeafe',
+500: '#3b82f6',
+600: '#2563eb',
+700: '#1d4ed8',
+}
+}
+}
+}
+}
+</script>
+<style>
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+</style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen">
+
+<!-- Navbar -->
+<nav class="bg-white border-b border-slate-200 sticky top-0 z-10 shadow-sm">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex justify-between h-16 items-center">
+<div class="flex items-center gap-3">
+<!-- Logo Anda -->
+<img src="Arzhop new.png" alt="Antini Logo" class="h-10 w-10 object-contain drop-shadow-sm" onerror="this.src='https://ui-avatars.com/api/?name=Antini+PO&background=2563eb&color=fff'">
+<span class="font-bold text-xl text-slate-900">Antini PO</span>
+</div>
+<div>
+<span class="text-sm font-medium text-slate-500" id="currentDate"></span>
+</div>
+</div>
+</div>
+</nav>
+
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+<!-- Summary Cards -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+<div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex items-center gap-4">
+<div class="p-4 bg-blue-50 rounded-xl text-blue-600">
+<i data-lucide="shopping-cart" class="w-8 h-8"></i>
+</div>
+<div>
+<p class="text-sm font-medium text-slate-500">Total PO</p>
+<h3 class="text-2xl font-bold text-slate-900" id="summaryCount">0</h3>
+</div>
+</div>
+<div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex items-center gap-4">
+<div class="p-4 bg-green-50 rounded-xl text-green-600">
+<i data-lucide="wallet" class="w-8 h-8"></i>
+</div>
+<div>
+<p class="text-sm font-medium text-slate-500">Total Nilai Order</p>
+<h3 class="text-2xl font-bold text-slate-900" id="summaryTotal">Rp 0</h3>
+</div>
+</div>
+<div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex items-center gap-4">
+<div class="p-4 bg-orange-50 rounded-xl text-orange-600">
+<i data-lucide="alert-circle" class="w-8 h-8"></i>
+</div>
+<div>
+<p class="text-sm font-medium text-slate-500">Total Piutang (Sisa)</p>
+<h3 class="text-2xl font-bold text-slate-900" id="summarySisa">Rp 0</h3>
+</div>
+</div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<!-- Form Section -->
+<div class="lg:col-span-1">
+<div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 sticky top-24">
+<div class="mb-6 flex items-center justify-between">
+<h2 class="text-lg font-bold text-slate-900">Tambah PO Baru</h2>
+<button onclick="resetForm()" class="text-sm text-slate-400 hover:text-slate-600" title="Reset Form">
+<i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+</button>
+</div>
+
+<form id="poForm" class="space-y-4">
+<input type="hidden" id="editId" value="">
+
+<div>
+<label class="block text-sm font-medium text-slate-700 mb-1">Nama Customer / PIC</label>
+<input type="text" id="nama" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary-500 outline-none transition-all placeholder-slate-400" placeholder="Masukkan nama...">
+</div>
+
+<div>
+<label class="block text-sm font-medium text-slate-700 mb-1">Supplier</label>
+<input type="text" id="supplier" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary-500 outline-none transition-all placeholder-slate-400" placeholder="Nama supplier...">
+</div>
+
+<div>
+<label class="block text-sm font-medium text-slate-700 mb-1">Detail Orderan</label>
+<textarea id="orderan" required rows="2" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary-500 outline-none transition-all placeholder-slate-400" placeholder="Contoh: 100 pcs Kaos Polos"></textarea>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+<div>
+<label class="block text-sm font-medium text-slate-700 mb-1">Harga Jual (Rp)</label>
+<input type="number" id="harga" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary-500 outline-none transition-all" placeholder="0">
+</div>
+<div>
+<label class="block text-sm font-medium text-slate-700 mb-1">Harga Pusat (Rp)</label>
+<input type="number" id="hargaPusat" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary-500 outline-none transition-all" placeholder="0">
+</div>
+<div>
+<label class="block text-sm font-medium text-slate-700 mb-1">Harga Team (Rp)</label>
+<input type="number" id="hargaTeam" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary-500 outline-none transition-all" placeholder="0">
+</div>
+</div>
+
+<div class="grid grid-cols-2 gap-4">
+<div>
+<label class="block text-sm font-medium text-slate-700 mb-1">Bayar (Rp)</label>
+<input type="number" id="bayar" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary-500 outline-none transition-all" placeholder="0">
+</div>
+<div>
+<label class="block text-sm font-medium text-slate-700 mb-1">DP (Rp)</label>
+<input type="number" id="dp" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary-500 outline-none transition-all" placeholder="0">
+</div>
+</div>
+
+<div class="grid grid-cols-2 gap-4">
+<div>
+<label class="block text-sm font-medium text-slate-700 mb-1">Disc Team (Rp)</label>
+<input type="number" id="disc" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary-500 outline-none transition-all" placeholder="0" value="0">
+</div>
+<div>
+<label class="block text-sm font-medium text-slate-700 mb-1">Estimasi Ready</label>
+<input type="date" id="estimasi" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary-500 outline-none transition-all text-slate-600">
+</div>
+</div>
+
+<div class="pt-2 flex gap-3">
+<button type="submit" class="w-full bg-primary-600 hover:bg-primary-700 text-white font-medium py-2.5 px-4 rounded-xl transition-colors flex justify-center items-center gap-2">
+<i data-lucide="save" class="w-5 h-5"></i>
+<span id="btnSubmitText">Simpan PO</span>
+</button>
+</div>
+</form>
+</div>
+</div>
+
+<!-- Table Section -->
+<div class="lg:col-span-2">
+<div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+<div class="px-6 py-5 border-b border-slate-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-slate-50/50">
+<h2 class="text-lg font-bold text-slate-900">Daftar List PO</h2>
+
+<div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
+<!-- Action Buttons -->
+<button onclick="exportXLS()" class="flex items-center gap-2 px-3 py-2 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 rounded-lg text-sm font-medium transition-colors border border-emerald-200" title="Export to Excel">
+<i data-lucide="file-spreadsheet" class="w-4 h-4"></i> XLS
+</button>
+<button onclick="exportPDF()" class="flex items-center gap-2 px-3 py-2 bg-red-50 text-red-700 hover:bg-red-100 rounded-lg text-sm font-medium transition-colors border border-red-200" title="Export to PDF">
+<i data-lucide="file-text" class="w-4 h-4"></i> PDF
+</button>
+
+<!-- Search -->
+<div class="relative flex-grow md:flex-grow-0">
+<i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
+<input type="text" id="searchInput" placeholder="Cari nama/supplier..." class="pl-9 pr-4 py-2 w-full text-sm rounded-lg border border-slate-200 focus:ring-2 focus:ring-primary-500 outline-none md:w-56">
+</div>
+</div>
+</div>
+
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-white border-b border-slate-100 text-slate-500 text-sm">
+<th class="py-4 px-6 font-semibold whitespace-nowrap">Info Utama</th>
+<th class="py-4 px-6 font-semibold whitespace-nowrap">Orderan & Estimasi</th>
+<th class="py-4 px-6 font-semibold whitespace-nowrap">Keuangan</th>
+<th class="py-4 px-6 font-semibold text-center whitespace-nowrap">Status & Aksi</th>
+</tr>
+</thead>
+<tbody id="poTableBody" class="text-sm divide-y divide-slate-100">
+<!-- Data will be injected here -->
+</tbody>
+</table>
+</div>
+
+<!-- Empty State -->
+<div id="emptyState" class="hidden flex-col items-center justify-center py-16 px-4 text-center">
+<div class="bg-slate-50 p-6 rounded-full mb-4">
+<i data-lucide="inbox" class="w-12 h-12 text-slate-300"></i>
+</div>
+<h3 class="text-lg font-medium text-slate-900 mb-1">Belum ada PO</h3>
+<p class="text-slate-500">Mulai tambahkan daftar Purchase Order baru melalui form di samping.</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+
+<!-- Modal Konfirmasi Lunas -->
+<div id="lunasModal" class="fixed inset-0 bg-slate-900/50 z-50 hidden flex items-center justify-center opacity-0 transition-opacity">
+<div class="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 transform scale-95 transition-transform">
+<div class="w-12 h-12 rounded-full bg-green-100 text-green-600 flex items-center justify-center mb-4">
+<i data-lucide="check-circle" class="w-6 h-6"></i>
+</div>
+<h3 class="text-lg font-bold text-slate-900 mb-2">Tandai Lunas?</h3>
+<p class="text-slate-500 text-sm mb-6">Tindakan ini akan mengupdate nilai "Bayar" sehingga sisa tagihan menjadi Rp 0.</p>
+<div class="flex gap-3 justify-end">
+<button onclick="closeLunasModal()" class="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">Batal</button>
+<button id="confirmLunasBtn" class="px-4 py-2 text-sm font-medium bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors">Ya, Tandai Lunas</button>
+</div>
+</div>
+</div>
+
+<!-- Container Toast Message -->
+<div id="toastContainer" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2"></div>
+
+<script>
+// Registrasi Service Worker untuk PWA
+if ('serviceWorker' in navigator) {
+window.addEventListener('load', () => {
+navigator.serviceWorker.register('./sw.js').then(reg => {
+console.log('PWA Service Worker terdaftar!', reg.scope);
+}).catch(err => {
+console.log('Gagal mendaftar Service Worker', err);
+});
+});
+}
+
+// Initialize Lucide Icons
+lucide.createIcons();
+
+// State Management
+let poData = JSON.parse(localStorage.getItem('poData')) || [];
+let currentLunasId = null;
+
+// Custom Toast Message
+const showToast = (message) => {
+const container = document.getElementById('toastContainer');
+const toast = document.createElement('div');
+toast.className = 'bg-slate-800 text-white px-4 py-3 rounded-lg shadow-lg text-sm transition-opacity duration-300 flex items-center gap-2';
+toast.innerHTML = `<i data-lucide="info" class="w-4 h-4"></i> ${message}`;
+
+container.appendChild(toast);
+lucide.createIcons();
+
+setTimeout(() => {
+toast.classList.add('opacity-0');
+setTimeout(() => toast.remove(), 300);
+}, 3000);
+};
+
+// Utility: Format Rupiah
+const formatRupiah = (number) => {
+return new Intl.NumberFormat('id-ID', {
+style: 'currency',
+currency: 'IDR',
+minimumFractionDigits: 0
+}).format(number);
+};
+
+// Utility: Format Date
+const formatDate = (dateString) => {
+const options = { day: 'numeric', month: 'short', year: 'numeric' };
+return new Date(dateString).toLocaleDateString('id-ID', options);
+};
+
+// Set Current Date in Header
+const setHeaderDate = () => {
+const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+document.getElementById('currentDate').innerText = new Date().toLocaleDateString('id-ID', options);
+};
+setHeaderDate();
+
+// Render Table
+const renderTable = (dataToRender = poData) => {
+const tbody = document.getElementById('poTableBody');
+const emptyState = document.getElementById('emptyState');
+
+tbody.innerHTML = '';
+
+if (dataToRender.length === 0) {
+emptyState.classList.remove('hidden');
+emptyState.classList.add('flex');
+} else {
+emptyState.classList.add('hidden');
+emptyState.classList.remove('flex');
+
+dataToRender.forEach((po) => {
+const totalOrder = po.harga - po.disc;
+const totalDibayar = po.dp + po.bayar;
+const sisa = totalOrder - totalDibayar;
+const isLunas = sisa <= 0;
+
+const statusBadge = isLunas
+? `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700"><i data-lucide="check" class="w-3 h-3"></i> Lunas</span>`
+: `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-700"><i data-lucide="clock" class="w-3 h-3"></i> Sisa: ${formatRupiah(sisa)}</span>`;
+
+const row = document.createElement('tr');
+row.className = 'hover:bg-slate-50 transition-colors group border-b border-slate-50';
+row.innerHTML = `
+<td class="py-4 px-6 align-top">
+<div class="font-medium text-slate-900">${po.nama}</div>
+<div class="text-xs text-slate-500 mt-1 flex items-center gap-1">
+<i data-lucide="building-2" class="w-3 h-3"></i> ${po.supplier}
+</div>
+</td>
+<td class="py-4 px-6 max-w-[200px] align-top">
+<div class="truncate font-medium text-slate-700 whitespace-normal text-xs" title="${po.orderan}">${po.orderan}</div>
+<div class="text-xs text-blue-600 mt-2 font-medium flex items-center gap-1 bg-blue-50 w-max px-2 py-0.5 rounded">
+<i data-lucide="calendar" class="w-3 h-3"></i> Ready: ${formatDate(po.estimasi)}
+</div>
+</td>
+<td class="py-4 px-6 align-top">
+<div class="text-sm font-semibold text-slate-900 mb-1 border-b border-slate-100 pb-1">Jual: ${formatRupiah(po.harga)}</div>
+<div class="text-xs text-slate-600 mb-1">Pusat: ${formatRupiah(po.hargaPusat)}</div>
+<div class="text-xs text-slate-600 mb-1">Team: ${formatRupiah(po.hargaTeam || 0)}</div>
+<div class="text-xs text-slate-600 mb-1">Bayar: ${formatRupiah(po.bayar)}</div>
+<div class="text-xs text-slate-600 mb-1">DP: ${formatRupiah(po.dp)}</div>
+${po.disc > 0 ? `<div class="text-xs font-medium text-red-500 mt-1">Disc: -${formatRupiah(po.disc)}</div>` : ''}
+</td>
+<td class="py-4 px-6 text-center align-top">
+<div class="flex flex-col items-center gap-3">
+${statusBadge}
+<div class="flex items-center justify-center gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+${!isLunas ? `
+<button onclick="openLunasModal('${po.id}')" class="p-1.5 text-green-600 hover:bg-green-100 bg-green-50 md:bg-transparent rounded-md transition-colors" title="Tandai Lunas">
+<i data-lucide="check-square" class="w-4 h-4"></i>
+</button>
+` : ''}
+<button onclick="editPO('${po.id}')" class="p-1.5 text-blue-600 hover:bg-blue-100 bg-blue-50 md:bg-transparent rounded-md transition-colors" title="Edit">
+<i data-lucide="pencil" class="w-4 h-4"></i>
+</button>
+<button onclick="deletePO('${po.id}')" class="p-1.5 text-red-600 hover:bg-red-100 bg-red-50 md:bg-transparent rounded-md transition-colors" title="Hapus">
+<i data-lucide="trash-2" class="w-4 h-4"></i>
+</button>
+</div>
+</div>
+</td>
+`;
+tbody.appendChild(row);
+});
+}
+lucide.createIcons();
+updateSummary();
+};
+
+// Update Summary Cards
+const updateSummary = () => {
+const totalPO = poData.length;
+let totalNilai = 0;
+let totalSisa = 0;
+
+poData.forEach(po => {
+const totalOrder = po.harga - po.disc;
+const totalDibayar = po.dp + po.bayar;
+const sisa = totalOrder - totalDibayar;
+
+totalNilai += totalOrder;
+if (sisa > 0) totalSisa += sisa;
+});
+
+document.getElementById('summaryCount').innerText = totalPO;
+document.getElementById('summaryTotal').innerText = formatRupiah(totalNilai);
+document.getElementById('summarySisa').innerText = formatRupiah(totalSisa);
+};
+
+// Form Submit Handler
+document.getElementById('poForm').addEventListener('submit', function(e) {
+e.preventDefault();
+
+const id = document.getElementById('editId').value;
+const nama = document.getElementById('nama').value;
+const supplier = document.getElementById('supplier').value;
+const orderan = document.getElementById('orderan').value;
+const harga = parseFloat(document.getElementById('harga').value) || 0;
+const hargaPusat = parseFloat(document.getElementById('hargaPusat').value) || 0;
+const hargaTeam = parseFloat(document.getElementById('hargaTeam').value) || 0; // Field baru
+const bayar = parseFloat(document.getElementById('bayar').value) || 0;
+const disc = parseFloat(document.getElementById('disc').value) || 0;
+const dp = parseFloat(document.getElementById('dp').value) || 0;
+const estimasi = document.getElementById('estimasi').value;
+
+const newPO = {
+id: id ? id : Date.now().toString(),
+nama, supplier, orderan, harga, hargaPusat, hargaTeam, bayar, disc, dp, estimasi
+};
+
+if (id) {
+const index = poData.findIndex(po => po.id === id);
+poData[index] = newPO;
+showToast("PO berhasil diupdate!");
+} else {
+poData.push(newPO);
+showToast("PO baru berhasil ditambahkan!");
+}
+
+saveData();
+resetForm();
+renderTable();
+});
+
+// Edit PO
+const editPO = (id) => {
+const po = poData.find(p => p.id === id);
+if (po) {
+document.getElementById('editId').value = po.id;
+document.getElementById('nama').value = po.nama;
+document.getElementById('supplier').value = po.supplier;
+document.getElementById('orderan').value = po.orderan;
+document.getElementById('harga').value = po.harga;
+document.getElementById('hargaPusat').value = po.hargaPusat || 0;
+document.getElementById('hargaTeam').value = po.hargaTeam || 0; // Load field baru
+document.getElementById('bayar').value = po.bayar || 0;
+document.getElementById('disc').value = po.disc;
+document.getElementById('dp').value = po.dp;
+document.getElementById('estimasi').value = po.estimasi;
+
+document.getElementById('btnSubmitText').innerText = 'Update PO';
+window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+};
+
+// Delete PO
+const deletePO = (id) => {
+if (confirm('Apakah Anda yakin ingin menghapus data PO ini?')) {
+poData = poData.filter(po => po.id !== id);
+saveData();
+renderTable();
+showToast("Data PO dihapus!");
+}
+};
+
+// Modal Lunas Logic
+const lunasModal = document.getElementById('lunasModal');
+const lunasModalContent = lunasModal.querySelector('div');
+
+const openLunasModal = (id) => {
+currentLunasId = id;
+lunasModal.classList.remove('hidden');
+setTimeout(() => {
+lunasModal.classList.remove('opacity-0');
+lunasModalContent.classList.remove('scale-95');
+}, 10);
+};
+
+const closeLunasModal = () => {
+currentLunasId = null;
+lunasModal.classList.add('opacity-0');
+lunasModalContent.classList.add('scale-95');
+setTimeout(() => {
+lunasModal.classList.add('hidden');
+}, 300);
+};
+
+document.getElementById('confirmLunasBtn').addEventListener('click', () => {
+if (currentLunasId) {
+const index = poData.findIndex(p => p.id === currentLunasId);
+if (index !== -1) {
+const po = poData[index];
+const sisa = (po.harga - po.disc) - po.dp - po.bayar;
+poData[index].bayar += sisa;
+saveData();
+renderTable();
+showToast("PO telah ditandai lunas!");
+}
+}
+closeLunasModal();
+});
+
+// Search Logic
+document.getElementById('searchInput').addEventListener('input', function(e) {
+const keyword = e.target.value.toLowerCase();
+const filteredData = poData.filter(po =>
+po.nama.toLowerCase().includes(keyword) ||
+po.supplier.toLowerCase().includes(keyword) ||
+po.orderan.toLowerCase().includes(keyword)
+);
+renderTable(filteredData);
+});
+
+// Export ke Excel (XLS)
+const exportXLS = () => {
+if(poData.length === 0) return showToast("Belum ada data untuk di-export.");
+
+const worksheetData = poData.map(po => {
+const sisa = (po.harga - po.disc) - po.dp - po.bayar;
+return {
+"Nama Customer": po.nama,
+"Supplier": po.supplier,
+"Orderan": po.orderan,
+"Harga Jual": po.harga,
+"Harga Pusat": po.hargaPusat || 0,
+"Harga Team": po.hargaTeam || 0,
+"Discount": po.disc,
+"DP": po.dp,
+"Bayar": po.bayar || 0,
+"Sisa Tagihan": sisa,
+"Status": sisa <= 0 ? "Lunas" : "Belum Lunas",
+"Estimasi Ready": po.estimasi
+};
+});
+
+const worksheet = XLSX.utils.json_to_sheet(worksheetData);
+
+const colWidths = [
+{ wch: 20 }, { wch: 20 }, { wch: 30 }, { wch: 15 }, { wch: 15 },
+{ wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 15 }
+];
+worksheet['!cols'] = colWidths;
+
+const range = XLSX.utils.decode_range(worksheet['!ref']);
+for (let R = range.s.r; R <= range.e.r; ++R) {
+for (let C = range.s.c; C <= range.e.c; ++C) {
+const cellAddress = { c: C, r: R };
+const cellRef = XLSX.utils.encode_cell(cellAddress);
+
+if (!worksheet[cellRef]) continue;
+if (!worksheet[cellRef].s) worksheet[cellRef].s = {};
+
+worksheet[cellRef].s.border = {
+top: { style: "thin", color: { rgb: "000000" } },
+bottom: { style: "thin", color: { rgb: "000000" } },
+left: { style: "thin", color: { rgb: "000000" } },
+right: { style: "thin", color: { rgb: "000000" } }
+};
+
+if (R === 0) {
+worksheet[cellRef].s.font = { bold: true, color: { rgb: "FFFFFF" } };
+worksheet[cellRef].s.fill = { fgColor: { rgb: "2563EB" } };
+worksheet[cellRef].s.alignment = { horizontal: "center", vertical: "center" };
+} else if (C >= 3 && C <= 9) { // Kolom angka
+worksheet[cellRef].s.alignment = { horizontal: "right" };
+}
+}
+}
+
+const workbook = XLSX.utils.book_new();
+XLSX.utils.book_append_sheet(workbook, worksheet, "Daftar PO");
+XLSX.writeFile(workbook, `Antini_PO_${new Date().toISOString().split('T')[0]}.xlsx`);
+showToast("Berhasil mendownload Excel!");
+};
+
+// Export ke PDF
+const exportPDF = () => {
+if(poData.length === 0) return showToast("Belum ada data untuk di-export.");
+
+const { jsPDF } = window.jspdf;
+const doc = new jsPDF('landscape');
+
+doc.setFontSize(14);
+doc.text("Daftar Purchase Order Antini", 14, 15);
+doc.setFontSize(10);
+doc.text(`Dicetak pada: ${new Date().toLocaleDateString('id-ID')}`, 14, 22);
+
+const tableColumn = ["Nama", "Supplier", "Orderan", "Estimasi", "Hrg Jual", "Hrg Pusat", "Hrg Team", "Disc", "DP", "Bayar", "Sisa"];
+const tableRows = [];
+
+poData.forEach(po => {
+const sisa = (po.harga - po.disc) - po.dp - po.bayar;
+const poDataRow = [
+po.nama,
+po.supplier,
+po.orderan,
+formatDate(po.estimasi),
+formatRupiah(po.harga),
+formatRupiah(po.hargaPusat || 0),
+formatRupiah(po.hargaTeam || 0),
+formatRupiah(po.disc),
+formatRupiah(po.dp),
+formatRupiah(po.bayar || 0),
+formatRupiah(sisa)
+];
+tableRows.push(poDataRow);
+});
+
+doc.autoTable({
+head: [tableColumn],
+body: tableRows,
+startY: 28,
+theme: 'grid',
+styles: {
+fontSize: 8,
+cellPadding: 3,
+lineWidth: 0.2,
+lineColor: [0, 0, 0],
+textColor: [20, 20, 20]
+},
+headStyles: {
+fillColor: [37, 99, 235],
+textColor: [255, 255, 255],
+lineWidth: 0.2,
+lineColor: [0, 0, 0]
+},
+columnStyles: {
+4: { halign: 'right' },
+5: { halign: 'right' },
+6: { halign: 'right' },
+7: { halign: 'right' },
+8: { halign: 'right' },
+9: { halign: 'right' },
+10: { halign: 'right' }
+}
+});
+
+doc.save(`Antini_PO_${new Date().toISOString().split('T')[0]}.pdf`);
+showToast("Berhasil mendownload PDF!");
+};
+
+// Save to LocalStorage
+const saveData = () => {
+localStorage.setItem('poData', JSON.stringify(poData));
+};
+
+// Reset Form
+const resetForm = () => {
+document.getElementById('poForm').reset();
+document.getElementById('editId').value = '';
+document.getElementById('disc').value = '0';
+document.getElementById('btnSubmitText').innerText = 'Simpan PO';
+};
+
+// Initial Render
+renderTable();
+
+</script>
+</body>
+</html>
