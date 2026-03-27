@@ -8,7 +8,7 @@
 <!-- PWA Meta Tags -->
 <link rel="manifest" href="./manifest.json">
 <meta name="theme-color" content="#ffffff">
-<link rel="apple-touch-icon" href="./Arzhop new.png">
+<link rel="apple-touch-icon" href="./Antini-logo.png">
 
 <!-- Tailwind CSS -->
 <script src="https://cdn.tailwindcss.com"></script>
@@ -16,7 +16,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <!-- Lucide Icons -->
 <script src="https://unpkg.com/lucide@latest"></script>
-<!-- SheetJS Style (Excel Export with Styling/Borders) -->
+<!-- SheetJS Style (Excel Export & Import) -->
 <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
 <!-- jsPDF & AutoTable (PDF Export) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -31,11 +31,11 @@ sans: ['Inter', 'sans-serif'],
 },
 colors: {
 primary: {
-50: '#eff6ff',
-100: '#dbeafe',
-500: '#3b82f6',
-600: '#2563eb',
-700: '#1d4ed8',
+50: '#fdf4ff',
+100: '#fae8ff',
+500: '#d946ef',
+600: '#c026d3',
+700: '#a21caf',
 }
 }
 }
@@ -44,9 +44,9 @@ primary: {
 </script>
 <style>
 ::-webkit-scrollbar { width: 8px; height: 8px; }
-::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
-::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+::-webkit-scrollbar-track { background: #fdf4ff; border-radius: 4px; }
+::-webkit-scrollbar-thumb { background: #f0abfc; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #d946ef; }
 input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 </style>
@@ -58,12 +58,17 @@ input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 <div class="flex justify-between h-16 items-center">
 <div class="flex items-center gap-3">
-<!-- Logo Anda -->
-<img src="Arzhop new.png" alt="Antini Logo" class="h-10 w-10 object-contain drop-shadow-sm" onerror="this.src='https://ui-avatars.com/api/?name=Antini+PO&background=2563eb&color=fff'">
+<div class="bg-primary-500 p-2 rounded-lg text-white flex items-center justify-center h-10 w-10 overflow-hidden">
+<img src="Antini-logo.png" alt="Antini Logo" class="h-full w-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+<i data-lucide="package" class="hidden"></i>
+</div>
 <span class="font-bold text-xl text-slate-900">Antini PO</span>
 </div>
-<div>
-<span class="text-sm font-medium text-slate-500" id="currentDate"></span>
+<div class="flex items-center gap-4">
+<span class="text-sm font-medium text-slate-500 hidden sm:block" id="currentDate"></span>
+<button onclick="keluarApp()" class="flex items-center gap-2 bg-red-50 hover:bg-red-100 text-red-600 px-3 py-1.5 rounded-lg text-sm font-semibold transition-colors border border-red-100" title="Simpan & Keluar">
+<i data-lucide="log-out" class="w-4 h-4"></i> Keluar
+</button>
 </div>
 </div>
 </div>
@@ -74,30 +79,30 @@ input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin
 <!-- Summary Cards -->
 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
 <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex items-center gap-4">
-<div class="p-4 bg-blue-50 rounded-xl text-blue-600">
+<div class="p-4 bg-primary-50 rounded-xl text-primary-600 shrink-0">
 <i data-lucide="shopping-cart" class="w-8 h-8"></i>
 </div>
 <div>
-<p class="text-sm font-medium text-slate-500">Total PO</p>
+<p class="text-sm font-medium text-slate-500 mb-0.5">Total PO</p>
 <h3 class="text-2xl font-bold text-slate-900" id="summaryCount">0</h3>
 </div>
 </div>
 <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex items-center gap-4">
-<div class="p-4 bg-green-50 rounded-xl text-green-600">
+<div class="p-4 bg-indigo-50 rounded-xl text-indigo-600 shrink-0">
 <i data-lucide="wallet" class="w-8 h-8"></i>
 </div>
 <div>
-<p class="text-sm font-medium text-slate-500">Total Nilai Order</p>
-<h3 class="text-2xl font-bold text-slate-900" id="summaryTotal">Rp 0</h3>
+<p class="text-sm font-medium text-slate-500 mb-0.5">Total Nilai Order</p>
+<h3 class="text-2xl font-bold text-slate-900 truncate" id="summaryTotal" title="Rp 0">Rp 0</h3>
 </div>
 </div>
 <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex items-center gap-4">
-<div class="p-4 bg-orange-50 rounded-xl text-orange-600">
+<div class="p-4 bg-orange-50 rounded-xl text-orange-600 shrink-0">
 <i data-lucide="alert-circle" class="w-8 h-8"></i>
 </div>
 <div>
-<p class="text-sm font-medium text-slate-500">Total Piutang (Sisa)</p>
-<h3 class="text-2xl font-bold text-slate-900" id="summarySisa">Rp 0</h3>
+<p class="text-sm font-medium text-slate-500 mb-0.5">Total Piutang (Sisa)</p>
+<h3 class="text-2xl font-bold text-slate-900 truncate" id="summarySisa" title="Rp 0">Rp 0</h3>
 </div>
 </div>
 </div>
@@ -108,7 +113,7 @@ input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin
 <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 sticky top-24">
 <div class="mb-6 flex items-center justify-between">
 <h2 class="text-lg font-bold text-slate-900">Tambah PO Baru</h2>
-<button onclick="resetForm()" class="text-sm text-slate-400 hover:text-slate-600" title="Reset Form">
+<button type="button" onclick="resetForm()" class="text-sm text-slate-400 hover:text-slate-600" title="Reset Form">
 <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
 </button>
 </div>
@@ -131,7 +136,7 @@ input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin
 <textarea id="orderan" required rows="2" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary-500 outline-none transition-all placeholder-slate-400" placeholder="Contoh: 100 pcs Kaos Polos"></textarea>
 </div>
 
-<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+<div class="grid grid-cols-2 gap-4">
 <div>
 <label class="block text-sm font-medium text-slate-700 mb-1">Harga Jual (Rp)</label>
 <input type="number" id="harga" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary-500 outline-none transition-all" placeholder="0">
@@ -140,9 +145,16 @@ input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin
 <label class="block text-sm font-medium text-slate-700 mb-1">Harga Pusat (Rp)</label>
 <input type="number" id="hargaPusat" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary-500 outline-none transition-all" placeholder="0">
 </div>
+</div>
+
+<div class="grid grid-cols-2 gap-4">
 <div>
-<label class="block text-sm font-medium text-slate-700 mb-1">Harga Team (Rp)</label>
-<input type="number" id="hargaTeam" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary-500 outline-none transition-all" placeholder="0">
+<label class="block text-sm font-medium text-slate-700 mb-1">Harga Agen (Rp)</label>
+<input type="number" id="hargaAgen" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary-500 outline-none transition-all" placeholder="0">
+</div>
+<div>
+<label class="block text-sm font-medium text-slate-700 mb-1">Disc Team (Rp)</label>
+<input type="number" id="disc" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary-500 outline-none transition-all" placeholder="0" value="0">
 </div>
 </div>
 
@@ -157,15 +169,9 @@ input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin
 </div>
 </div>
 
-<div class="grid grid-cols-2 gap-4">
-<div>
-<label class="block text-sm font-medium text-slate-700 mb-1">Disc Team (Rp)</label>
-<input type="number" id="disc" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary-500 outline-none transition-all" placeholder="0" value="0">
-</div>
 <div>
 <label class="block text-sm font-medium text-slate-700 mb-1">Estimasi Ready</label>
 <input type="date" id="estimasi" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary-500 outline-none transition-all text-slate-600">
-</div>
 </div>
 
 <div class="pt-2 flex gap-3">
@@ -181,22 +187,43 @@ input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin
 <!-- Table Section -->
 <div class="lg:col-span-2">
 <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-<div class="px-6 py-5 border-b border-slate-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-slate-50/50">
+<div class="px-6 py-5 border-b border-slate-100 flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 bg-slate-50/50">
 <h2 class="text-lg font-bold text-slate-900">Daftar List PO</h2>
 
-<div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
-<!-- Action Buttons -->
-<button onclick="exportXLS()" class="flex items-center gap-2 px-3 py-2 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 rounded-lg text-sm font-medium transition-colors border border-emerald-200" title="Export to Excel">
+<div class="flex flex-wrap items-center gap-2 w-full xl:w-auto">
+<!-- Hidden inputs for data import/restore -->
+<input type="file" id="restoreFile" accept=".json" class="hidden" onchange="restoreData(event)">
+<input type="file" id="importExcelFile" accept=".xlsx, .xls, .csv" class="hidden" onchange="importExcel(event)">
+
+<!-- Tombol Backup & Restore .JSON -->
+<button onclick="backupData()" class="flex items-center gap-1.5 px-3 py-2 bg-blue-50 text-blue-700 hover:bg-blue-100 rounded-lg text-xs font-semibold transition-colors border border-blue-200" title="Bagikan / Simpan Cadangan Data">
+<i data-lucide="share-2" class="w-4 h-4"></i> Backup
+</button>
+<button onclick="document.getElementById('restoreFile').click()" class="flex items-center gap-1.5 px-3 py-2 bg-purple-50 text-purple-700 hover:bg-purple-100 rounded-lg text-xs font-semibold transition-colors border border-purple-200" title="Pulihkan Data dari JSON">
+<i data-lucide="upload-cloud" class="w-4 h-4"></i> Restore
+</button>
+
+<div class="h-6 w-px bg-slate-200 mx-1 hidden sm:block"></div>
+
+<!-- Tombol Import Excel -->
+<button onclick="document.getElementById('importExcelFile').click()" class="flex items-center gap-1.5 px-3 py-2 bg-teal-50 text-teal-700 hover:bg-teal-100 rounded-lg text-xs font-semibold transition-colors border border-teal-200" title="Pulihkan Data dari Excel (XLS/CSV)">
+<i data-lucide="file-up" class="w-4 h-4"></i> Import XLS
+</button>
+
+<div class="h-6 w-px bg-slate-200 mx-1 hidden sm:block"></div>
+
+<!-- Tombol Export -->
+<button onclick="exportXLS()" class="flex items-center gap-1.5 px-3 py-2 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 rounded-lg text-xs font-semibold transition-colors border border-emerald-200" title="Export to Excel">
 <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> XLS
 </button>
-<button onclick="exportPDF()" class="flex items-center gap-2 px-3 py-2 bg-red-50 text-red-700 hover:bg-red-100 rounded-lg text-sm font-medium transition-colors border border-red-200" title="Export to PDF">
+<button onclick="exportPDF()" class="flex items-center gap-1.5 px-3 py-2 bg-red-50 text-red-700 hover:bg-red-100 rounded-lg text-xs font-semibold transition-colors border border-red-200" title="Export to PDF">
 <i data-lucide="file-text" class="w-4 h-4"></i> PDF
 </button>
 
 <!-- Search -->
-<div class="relative flex-grow md:flex-grow-0">
+<div class="relative flex-grow xl:flex-grow-0 mt-2 xl:mt-0 w-full xl:w-auto">
 <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
-<input type="text" id="searchInput" placeholder="Cari nama/supplier..." class="pl-9 pr-4 py-2 w-full text-sm rounded-lg border border-slate-200 focus:ring-2 focus:ring-primary-500 outline-none md:w-56">
+<input type="text" id="searchInput" placeholder="Cari nama/supplier..." class="pl-9 pr-4 py-2 w-full text-sm rounded-lg border border-slate-200 focus:ring-2 focus:ring-primary-500 outline-none xl:w-48">
 </div>
 </div>
 </div>
@@ -246,34 +273,40 @@ input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin
 </div>
 
 <!-- Container Toast Message -->
-<div id="toastContainer" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2"></div>
+<div id="toastContainer" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
 <script>
 // Registrasi Service Worker untuk PWA
 if ('serviceWorker' in navigator) {
 window.addEventListener('load', () => {
-navigator.serviceWorker.register('./sw.js').then(reg => {
-console.log('PWA Service Worker terdaftar!', reg.scope);
-}).catch(err => {
-console.log('Gagal mendaftar Service Worker', err);
-});
+navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW Error:', err));
 });
 }
 
-// Initialize Lucide Icons
+// Initialize Icons
 lucide.createIcons();
 
-// State Management - KUNCI LOCAL STORAGE DIUBAH MENJADI 'antiniPoData' AGAR TIDAK BENTROK
-let poData = JSON.parse(localStorage.getItem('antiniPoData')) || [];
+// KUNCI PENYIMPANAN BARU KHUSUS ANTINI PO (Aman dari SecurityError)
+let poData = [];
+const getStorageData = () => {
+try {
+const stored = window.localStorage.getItem('antiniPoData');
+return stored ? JSON.parse(stored) : [];
+} catch (error) {
+console.warn("Akses localStorage diblokir. Aplikasi menggunakan memori sementara.");
+return [];
+}
+};
+
+poData = getStorageData();
 let currentLunasId = null;
 
 // Custom Toast Message
 const showToast = (message) => {
 const container = document.getElementById('toastContainer');
 const toast = document.createElement('div');
-toast.className = 'bg-slate-800 text-white px-4 py-3 rounded-lg shadow-lg text-sm transition-opacity duration-300 flex items-center gap-2';
+toast.className = 'bg-slate-800 text-white px-4 py-3 rounded-lg shadow-lg text-sm transition-opacity duration-300 flex items-center gap-2 pointer-events-auto';
 toast.innerHTML = `<i data-lucide="info" class="w-4 h-4"></i> ${message}`;
-
 container.appendChild(toast);
 lucide.createIcons();
 
@@ -283,33 +316,31 @@ setTimeout(() => toast.remove(), 300);
 }, 3000);
 };
 
-// Utility: Format Rupiah
+// Utility Formatter
+const formatRupiahShort = (number) => {
+if (number >= 1000000000) return 'Rp ' + (number / 1000000000).toFixed(1).replace(/\.0$/, '') + ' M';
+if (number >= 1000000) return 'Rp ' + (number / 1000000).toFixed(1).replace(/\.0$/, '') + ' Jt';
+return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(number);
+};
+
 const formatRupiah = (number) => {
-return new Intl.NumberFormat('id-ID', {
-style: 'currency',
-currency: 'IDR',
-minimumFractionDigits: 0
-}).format(number);
+return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(number);
 };
 
-// Utility: Format Date
 const formatDate = (dateString) => {
-const options = { day: 'numeric', month: 'short', year: 'numeric' };
-return new Date(dateString).toLocaleDateString('id-ID', options);
+return new Date(dateString).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
 };
 
-// Set Current Date in Header
+// Header Date
 const setHeaderDate = () => {
-const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-document.getElementById('currentDate').innerText = new Date().toLocaleDateString('id-ID', options);
+document.getElementById('currentDate').innerText = new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 };
 setHeaderDate();
 
-// Render Table
+// Main Render
 const renderTable = (dataToRender = poData) => {
 const tbody = document.getElementById('poTableBody');
 const emptyState = document.getElementById('emptyState');
-
 tbody.innerHTML = '';
 
 if (dataToRender.length === 0) {
@@ -340,14 +371,14 @@ row.innerHTML = `
 </td>
 <td class="py-4 px-6 max-w-[200px] align-top">
 <div class="truncate font-medium text-slate-700 whitespace-normal text-xs" title="${po.orderan}">${po.orderan}</div>
-<div class="text-xs text-blue-600 mt-2 font-medium flex items-center gap-1 bg-blue-50 w-max px-2 py-0.5 rounded">
+<div class="text-xs text-primary-600 mt-2 font-medium flex items-center gap-1 bg-primary-50 w-max px-2 py-0.5 rounded">
 <i data-lucide="calendar" class="w-3 h-3"></i> Ready: ${formatDate(po.estimasi)}
 </div>
 </td>
 <td class="py-4 px-6 align-top">
 <div class="text-sm font-semibold text-slate-900 mb-1 border-b border-slate-100 pb-1">Jual: ${formatRupiah(po.harga)}</div>
 <div class="text-xs text-slate-600 mb-1">Pusat: ${formatRupiah(po.hargaPusat)}</div>
-<div class="text-xs text-slate-600 mb-1">Team: ${formatRupiah(po.hargaTeam || 0)}</div>
+${po.hargaAgen ? `<div class="text-xs font-medium text-purple-600 mb-1">Agen: ${formatRupiah(po.hargaAgen)}</div>` : ''}
 <div class="text-xs text-slate-600 mb-1">Bayar: ${formatRupiah(po.bayar)}</div>
 <div class="text-xs text-slate-600 mb-1">DP: ${formatRupiah(po.dp)}</div>
 ${po.disc > 0 ? `<div class="text-xs font-medium text-red-500 mt-1">Disc: -${formatRupiah(po.disc)}</div>` : ''}
@@ -378,11 +409,9 @@ lucide.createIcons();
 updateSummary();
 };
 
-// Update Summary Cards
 const updateSummary = () => {
 const totalPO = poData.length;
-let totalNilai = 0;
-let totalSisa = 0;
+let totalNilai = 0, totalSisa = 0;
 
 poData.forEach(po => {
 const totalOrder = po.harga - po.disc;
@@ -394,29 +423,29 @@ if (sisa > 0) totalSisa += sisa;
 });
 
 document.getElementById('summaryCount').innerText = totalPO;
-document.getElementById('summaryTotal').innerText = formatRupiah(totalNilai);
-document.getElementById('summarySisa').innerText = formatRupiah(totalSisa);
+document.getElementById('summaryTotal').title = formatRupiah(totalNilai);
+document.getElementById('summarySisa').title = formatRupiah(totalSisa);
+
+document.getElementById('summaryTotal').innerText = formatRupiahShort(totalNilai);
+document.getElementById('summarySisa').innerText = formatRupiahShort(totalSisa);
 };
 
-// Form Submit Handler
+// Form Submission
 document.getElementById('poForm').addEventListener('submit', function(e) {
 e.preventDefault();
-
 const id = document.getElementById('editId').value;
-const nama = document.getElementById('nama').value;
-const supplier = document.getElementById('supplier').value;
-const orderan = document.getElementById('orderan').value;
-const harga = parseFloat(document.getElementById('harga').value) || 0;
-const hargaPusat = parseFloat(document.getElementById('hargaPusat').value) || 0;
-const hargaTeam = parseFloat(document.getElementById('hargaTeam').value) || 0; // Field baru
-const bayar = parseFloat(document.getElementById('bayar').value) || 0;
-const disc = parseFloat(document.getElementById('disc').value) || 0;
-const dp = parseFloat(document.getElementById('dp').value) || 0;
-const estimasi = document.getElementById('estimasi').value;
-
 const newPO = {
 id: id ? id : Date.now().toString(),
-nama, supplier, orderan, harga, hargaPusat, hargaTeam, bayar, disc, dp, estimasi
+nama: document.getElementById('nama').value,
+supplier: document.getElementById('supplier').value,
+orderan: document.getElementById('orderan').value,
+harga: parseFloat(document.getElementById('harga').value) || 0,
+hargaPusat: parseFloat(document.getElementById('hargaPusat').value) || 0,
+hargaAgen: parseFloat(document.getElementById('hargaAgen').value) || 0,
+bayar: parseFloat(document.getElementById('bayar').value) || 0,
+disc: parseFloat(document.getElementById('disc').value) || 0,
+dp: parseFloat(document.getElementById('dp').value) || 0,
+estimasi: document.getElementById('estimasi').value
 };
 
 if (id) {
@@ -427,13 +456,12 @@ showToast("PO berhasil diupdate!");
 poData.push(newPO);
 showToast("PO baru berhasil ditambahkan!");
 }
-
 saveData();
 resetForm();
 renderTable();
 });
 
-// Edit PO
+// Edit Data
 const editPO = (id) => {
 const po = poData.find(p => p.id === id);
 if (po) {
@@ -443,20 +471,19 @@ document.getElementById('supplier').value = po.supplier;
 document.getElementById('orderan').value = po.orderan;
 document.getElementById('harga').value = po.harga;
 document.getElementById('hargaPusat').value = po.hargaPusat || 0;
-document.getElementById('hargaTeam').value = po.hargaTeam || 0; // Load field baru
+document.getElementById('hargaAgen').value = po.hargaAgen || 0;
 document.getElementById('bayar').value = po.bayar || 0;
 document.getElementById('disc').value = po.disc;
 document.getElementById('dp').value = po.dp;
 document.getElementById('estimasi').value = po.estimasi;
-
 document.getElementById('btnSubmitText').innerText = 'Update PO';
 window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 };
 
-// Delete PO
+// Delete Data
 const deletePO = (id) => {
-if (confirm('Apakah Anda yakin ingin menghapus data PO ini?')) {
+if (confirm('Apakah Anda yakin ingin menghapus data PO Antini ini?')) {
 poData = poData.filter(po => po.id !== id);
 saveData();
 renderTable();
@@ -464,7 +491,7 @@ showToast("Data PO dihapus!");
 }
 };
 
-// Modal Lunas Logic
+// Lunas Logic
 const lunasModal = document.getElementById('lunasModal');
 const lunasModalContent = lunasModal.querySelector('div');
 
@@ -481,9 +508,7 @@ const closeLunasModal = () => {
 currentLunasId = null;
 lunasModal.classList.add('opacity-0');
 lunasModalContent.classList.add('scale-95');
-setTimeout(() => {
-lunasModal.classList.add('hidden');
-}, 300);
+setTimeout(() => lunasModal.classList.add('hidden'), 300);
 };
 
 document.getElementById('confirmLunasBtn').addEventListener('click', () => {
@@ -501,7 +526,7 @@ showToast("PO telah ditandai lunas!");
 closeLunasModal();
 });
 
-// Search Logic
+// Search Engine
 document.getElementById('searchInput').addEventListener('input', function(e) {
 const keyword = e.target.value.toLowerCase();
 const filteredData = poData.filter(po =>
@@ -512,148 +537,215 @@ po.orderan.toLowerCase().includes(keyword)
 renderTable(filteredData);
 });
 
-// Export ke Excel (XLS)
-const exportXLS = () => {
-if(poData.length === 0) return showToast("Belum ada data untuk di-export.");
+// Backup to JSON (Share API)
+const backupData = async () => {
+if (poData.length === 0) return showToast("Tidak ada data untuk dibackup!");
 
-const worksheetData = poData.map(po => {
-const sisa = (po.harga - po.disc) - po.dp - po.bayar;
+const jsonData = JSON.stringify(poData);
+const fileName = `Backup_Antini_PO_${new Date().toISOString().split('T')[0]}.json`;
+
+if (navigator.canShare) {
+try {
+const file = new File([jsonData], fileName, { type: "application/json" });
+
+if (navigator.canShare({ files: [file] })) {
+await navigator.share({
+files: [file],
+title: 'Backup PO Antini',
+text: 'Berikut adalah file cadangan (backup) data PO Antini.'
+});
+showToast("Menu bagikan berhasil dibuka!");
+return;
+}
+} catch (error) {
+console.log('User membatalkan share atau terjadi error:', error);
+return;
+}
+}
+
+const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(jsonData);
+const downloadAnchorNode = document.createElement('a');
+downloadAnchorNode.setAttribute("href", dataStr);
+downloadAnchorNode.setAttribute("download", fileName);
+document.body.appendChild(downloadAnchorNode);
+downloadAnchorNode.click();
+downloadAnchorNode.remove();
+showToast("File backup otomatis diunduh!");
+};
+
+// Restore from JSON
+const restoreData = (event) => {
+const file = event.target.files[0];
+if (!file) return;
+const reader = new FileReader();
+reader.onload = function(e) {
+try {
+const importedData = JSON.parse(e.target.result);
+if (Array.isArray(importedData)) {
+poData = importedData;
+saveData();
+renderTable();
+showToast("Data berhasil dipulihkan!");
+} else {
+alert("Format file JSON tidak valid.");
+}
+} catch (error) {
+alert("Gagal membaca file JSON.");
+}
+};
+reader.readAsText(file);
+event.target.value = '';
+};
+
+// Import Excel (.XLSX / .CSV)
+const importExcel = (event) => {
+const file = event.target.files[0];
+if (!file) return;
+
+const reader = new FileReader();
+reader.onload = function(e) {
+try {
+const data = new Uint8Array(e.target.result);
+const workbook = XLSX.read(data, {type: 'array'});
+const firstSheetName = workbook.SheetNames[0];
+const worksheet = workbook.Sheets[firstSheetName];
+const excelData = XLSX.utils.sheet_to_json(worksheet);
+
+if(excelData.length === 0) {
+return alert("File Excel kosong!");
+}
+
+const importedPOs = excelData.map((row, index) => {
+let estimasiDate = "";
+if (row["Estimasi Ready"]) {
+try {
+const d = new Date(row["Estimasi Ready"]);
+if (!isNaN(d.getTime())) {
+estimasiDate = d.toISOString().split('T')[0];
+} else {
+estimasiDate = row["Estimasi Ready"];
+}
+} catch(err) {
+estimasiDate = row["Estimasi Ready"];
+}
+}
+
 return {
-"Nama Customer": po.nama,
-"Supplier": po.supplier,
-"Orderan": po.orderan,
-"Harga Jual": po.harga,
-"Harga Pusat": po.hargaPusat || 0,
-"Harga Team": po.hargaTeam || 0,
-"Discount": po.disc,
-"DP": po.dp,
-"Bayar": po.bayar || 0,
-"Sisa Tagihan": sisa,
-"Status": sisa <= 0 ? "Lunas" : "Belum Lunas",
-"Estimasi Ready": po.estimasi
+id: Date.now().toString() + index + Math.random().toString(36).substr(2, 5),
+nama: row["Nama Customer"] || "",
+supplier: row["Supplier"] || "",
+orderan: row["Orderan"] || "",
+harga: parseFloat(row["Harga Jual"]) || 0,
+hargaPusat: parseFloat(row["Harga Pusat"]) || 0,
+hargaAgen: parseFloat(row["Harga Agen"]) || 0,
+bayar: parseFloat(row["Bayar"]) || 0,
+disc: parseFloat(row["Discount"]) || 0,
+dp: parseFloat(row["DP"]) || 0,
+estimasi: estimasiDate
 };
 });
 
-const worksheet = XLSX.utils.json_to_sheet(worksheetData);
+poData = [...poData, ...importedPOs];
+saveData();
+renderTable();
+showToast("Data dari Excel berhasil diimpor!");
+} catch (error) {
+console.error(error);
+alert("Gagal membaca file Excel. Pastikan file sesuai template.");
+}
+};
+reader.readAsArrayBuffer(file);
+event.target.value = '';
+};
 
-const colWidths = [
-{ wch: 20 }, { wch: 20 }, { wch: 30 }, { wch: 15 }, { wch: 15 },
-{ wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 15 }
-];
-worksheet['!cols'] = colWidths;
+// Exit App
+const keluarApp = () => {
+saveData();
+showToast("Menyimpan data...");
+setTimeout(() => {
+if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+window.close();
+} else {
+window.location.href = "about:blank";
+}
+}, 800);
+};
+
+// Export XLS (Excel)
+const exportXLS = () => {
+if(poData.length === 0) return showToast("Belum ada data untuk di-export.");
+const worksheetData = poData.map(po => {
+const sisa = (po.harga - po.disc) - po.dp - po.bayar;
+return {
+"Nama Customer": po.nama, "Supplier": po.supplier, "Orderan": po.orderan,
+"Harga Jual": po.harga, "Harga Pusat": po.hargaPusat || 0, "Harga Agen": po.hargaAgen || 0,
+"Discount": po.disc, "DP": po.dp, "Bayar": po.bayar || 0, "Sisa Tagihan": sisa,
+"Status": sisa <= 0 ? "Lunas" : "Belum Lunas", "Estimasi Ready": po.estimasi
+};
+});
+const worksheet = XLSX.utils.json_to_sheet(worksheetData);
+worksheet['!cols'] = [{wch:20},{wch:20},{wch:30},{wch:15},{wch:15},{wch:15},{wch:15},{wch:15},{wch:15},{wch:15},{wch:15},{wch:15}];
 
 const range = XLSX.utils.decode_range(worksheet['!ref']);
 for (let R = range.s.r; R <= range.e.r; ++R) {
 for (let C = range.s.c; C <= range.e.c; ++C) {
-const cellAddress = { c: C, r: R };
-const cellRef = XLSX.utils.encode_cell(cellAddress);
-
+const cellRef = XLSX.utils.encode_cell({c:C, r:R});
 if (!worksheet[cellRef]) continue;
 if (!worksheet[cellRef].s) worksheet[cellRef].s = {};
-
-worksheet[cellRef].s.border = {
-top: { style: "thin", color: { rgb: "000000" } },
-bottom: { style: "thin", color: { rgb: "000000" } },
-left: { style: "thin", color: { rgb: "000000" } },
-right: { style: "thin", color: { rgb: "000000" } }
-};
-
+worksheet[cellRef].s.border = { top: {style:"thin", color:{rgb:"000000"}}, bottom: {style:"thin", color:{rgb:"000000"}}, left: {style:"thin", color:{rgb:"000000"}}, right: {style:"thin", color:{rgb:"000000"}} };
 if (R === 0) {
-worksheet[cellRef].s.font = { bold: true, color: { rgb: "FFFFFF" } };
-worksheet[cellRef].s.fill = { fgColor: { rgb: "2563EB" } };
-worksheet[cellRef].s.alignment = { horizontal: "center", vertical: "center" };
-} else if (C >= 3 && C <= 9) { // Kolom angka
-worksheet[cellRef].s.alignment = { horizontal: "right" };
+worksheet[cellRef].s.font = {bold:true, color:{rgb:"FFFFFF"}};
+worksheet[cellRef].s.fill = {fgColor:{rgb:"d946ef"}}; // Warna pink-ungu untuk Antini
+worksheet[cellRef].s.alignment = {horizontal:"center", vertical:"center"};
+} else if (C >= 3 && C <= 9) worksheet[cellRef].s.alignment = {horizontal:"right"};
 }
 }
-}
-
 const workbook = XLSX.utils.book_new();
 XLSX.utils.book_append_sheet(workbook, worksheet, "Daftar PO");
 XLSX.writeFile(workbook, `Antini_PO_${new Date().toISOString().split('T')[0]}.xlsx`);
-showToast("Berhasil mendownload Excel!");
+showToast("Mendownload Excel...");
 };
 
-// Export ke PDF
+// Export PDF
 const exportPDF = () => {
 if(poData.length === 0) return showToast("Belum ada data untuk di-export.");
-
 const { jsPDF } = window.jspdf;
 const doc = new jsPDF('landscape');
+doc.setFontSize(14); doc.text("Daftar Purchase Order Antini", 14, 15);
+doc.setFontSize(10); doc.text(`Dicetak pada: ${new Date().toLocaleDateString('id-ID')}`, 14, 22);
 
-doc.setFontSize(14);
-doc.text("Daftar Purchase Order Antini", 14, 15);
-doc.setFontSize(10);
-doc.text(`Dicetak pada: ${new Date().toLocaleDateString('id-ID')}`, 14, 22);
-
-const tableColumn = ["Nama", "Supplier", "Orderan", "Estimasi", "Hrg Jual", "Hrg Pusat", "Hrg Team", "Disc", "DP", "Bayar", "Sisa"];
-const tableRows = [];
-
-poData.forEach(po => {
-const sisa = (po.harga - po.disc) - po.dp - po.bayar;
-const poDataRow = [
-po.nama,
-po.supplier,
-po.orderan,
-formatDate(po.estimasi),
-formatRupiah(po.harga),
-formatRupiah(po.hargaPusat || 0),
-formatRupiah(po.hargaTeam || 0),
-formatRupiah(po.disc),
-formatRupiah(po.dp),
-formatRupiah(po.bayar || 0),
-formatRupiah(sisa)
-];
-tableRows.push(poDataRow);
+const tableRows = poData.map(po => {
+return [po.nama, po.supplier, po.orderan, formatDate(po.estimasi), formatRupiah(po.harga), formatRupiah(po.hargaPusat||0), formatRupiah(po.hargaAgen||0), formatRupiah(po.disc), formatRupiah(po.dp), formatRupiah(po.bayar||0), formatRupiah((po.harga-po.disc)-po.dp-po.bayar)];
 });
 
 doc.autoTable({
-head: [tableColumn],
-body: tableRows,
-startY: 28,
-theme: 'grid',
-styles: {
-fontSize: 8,
-cellPadding: 3,
-lineWidth: 0.2,
-lineColor: [0, 0, 0],
-textColor: [20, 20, 20]
-},
-headStyles: {
-fillColor: [37, 99, 235],
-textColor: [255, 255, 255],
-lineWidth: 0.2,
-lineColor: [0, 0, 0]
-},
-columnStyles: {
-4: { halign: 'right' },
-5: { halign: 'right' },
-6: { halign: 'right' },
-7: { halign: 'right' },
-8: { halign: 'right' },
-9: { halign: 'right' },
-10: { halign: 'right' }
-}
+head: [["Nama", "Supplier", "Orderan", "Estimasi", "Hrg Jual", "Hrg Pusat", "Hrg Agen", "Disc", "DP", "Bayar", "Sisa"]],
+body: tableRows, startY: 28, theme: 'grid',
+styles: { fontSize: 7, cellPadding: 3, lineWidth: 0.2, lineColor: [0,0,0], textColor: [20,20,20] },
+headStyles: { fillColor: [217, 70, 239], textColor: [255,255,255], lineWidth: 0.2, lineColor: [0,0,0] }, // Pink-ungu
+columnStyles: { 4:{halign:'right'}, 5:{halign:'right'}, 6:{halign:'right'}, 7:{halign:'right'}, 8:{halign:'right'}, 9:{halign:'right'}, 10:{halign:'right'} }
 });
-
 doc.save(`Antini_PO_${new Date().toISOString().split('T')[0]}.pdf`);
-showToast("Berhasil mendownload PDF!");
+showToast("Mendownload PDF...");
 };
 
-// Save to LocalStorage - KUNCI LOCAL STORAGE DIUBAH MENJADI 'antiniPoData' AGAR TIDAK BENTROK
 const saveData = () => {
-localStorage.setItem('antiniPoData', JSON.stringify(poData));
+try {
+window.localStorage.setItem('antiniPoData', JSON.stringify(poData)); // Kunci penyimpanan khusus Antini
+} catch (e) {
+console.warn("Gagal menyimpan ke localStorage. Ini normal jika dibuka pada mode keamanan tinggi.");
+}
 };
 
-// Reset Form
 const resetForm = () => {
 document.getElementById('poForm').reset();
 document.getElementById('editId').value = '';
 document.getElementById('disc').value = '0';
+document.getElementById('hargaAgen').value = '';
 document.getElementById('btnSubmitText').innerText = 'Simpan PO';
 };
 
-// Initial Render
+// Initialize
 renderTable();
 
 </script>
